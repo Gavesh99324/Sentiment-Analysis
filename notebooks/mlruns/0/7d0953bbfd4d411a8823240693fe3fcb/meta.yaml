@@ -1,0 +1,15 @@
+artifact_uri: file:///g:/Python%20Codes/Sentiment%20Analysis/notebooks/mlruns/0/7d0953bbfd4d411a8823240693fe3fcb/artifacts
+end_time: 1765631627077
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 7d0953bbfd4d411a8823240693fe3fcb
+run_name: RandomForest_Baseline_TrainTestSplit
+run_uuid: 7d0953bbfd4d411a8823240693fe3fcb
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1765631626998
+status: 4
+tags: []
+user_id: Tishan Jayasuriya
