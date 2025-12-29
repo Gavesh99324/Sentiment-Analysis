@@ -1,0 +1,15 @@
+artifact_uri: file:///G:/Python Codes/Sentiment Analysis/mlruns/350680276547524637/dc179c9e53e64e519882de48aed8a07f/artifacts
+end_time: 1767011097580
+entry_point_name: ''
+experiment_id: '350680276547524637'
+lifecycle_stage: active
+run_id: dc179c9e53e64e519882de48aed8a07f
+run_name: painted-finch-863
+run_uuid: dc179c9e53e64e519882de48aed8a07f
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1767011090466
+status: 3
+tags: []
+user_id: Tishan Jayasuriya

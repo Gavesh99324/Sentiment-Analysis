@@ -37,3 +37,71 @@ stages:
       md5: ba42408e7bd1e85685474d6a349ae57e.dir
       size: 5134850
       nfiles: 2
+  model_building:
+    cmd: python src/model/model_building.py
+    deps:
+    - path: data/interim/train_processed.csv
+      hash: md5
+      md5: 35027dfda8274bd9356544f2ff358aa4
+      size: 4134324
+    - path: src/model/model_building.py
+      hash: md5
+      md5: d2b9d6bafc76e98c46bb1633eac85b3d
+      size: 5740
+    params:
+      params.yaml:
+        model_building.learning_rate: 0.09
+        model_building.max_depth: 20
+        model_building.max_features: 1000
+        model_building.n_estimators: 367
+        model_building.ngram_range:
+        - 1
+        - 3
+    outs:
+    - path: lgbm_model.pkl
+      hash: md5
+      md5: 1645f072eb06f11285658e0181d76e6c
+      size: 3886710
+    - path: tfidf_vectorizer.pkl
+      hash: md5
+      md5: 54ae4ccbfc21a3927f9334a22d4c3c35
+      size: 36874
+  model_evaluation:
+    cmd: python src/model/model_evaluation.py
+    deps:
+    - path: data/interim/test_processed.csv
+      hash: md5
+      md5: 4f30375397ec89fead1745ee6d70f201
+      size: 1000526
+    - path: data/interim/train_processed.csv
+      hash: md5
+      md5: 35027dfda8274bd9356544f2ff358aa4
+      size: 4134324
+    - path: lgbm_model.pkl
+      hash: md5
+      md5: 1645f072eb06f11285658e0181d76e6c
+      size: 3886710
+    - path: src/model/model_evaluation.py
+      hash: md5
+      md5: 144add1348069aab9f01232678429851
+      size: 7626
+    - path: tfidf_vectorizer.pkl
+      hash: md5
+      md5: 54ae4ccbfc21a3927f9334a22d4c3c35
+      size: 36874
+    outs:
+    - path: experiment_info.json
+      hash: md5
+      md5: 335fdc9e7952a6cf9f057ca68dedb31c
+      size: 87
+  model_registration:
+    cmd: python src/model/register_model.py
+    deps:
+    - path: experiment_info.json
+      hash: md5
+      md5: 335fdc9e7952a6cf9f057ca68dedb31c
+      size: 87
+    - path: src/model/register_model.py
+      hash: md5
+      md5: b68514c1060f1e2232eefc5bc9c235e8
+      size: 2537
