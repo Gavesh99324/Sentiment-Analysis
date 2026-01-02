@@ -177,7 +177,7 @@ def main():
                 signature=signature,  # <--- Added for signature
                 input_example=input_example  # <--- Added input example
             )
-
+  
             # Save model info
             # artifact_uri = mlflow.get_artifact_uri()
             model_path = "lgbm_model"
