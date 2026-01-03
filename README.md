@@ -104,3 +104,5 @@ https://www.youtube.com/watch?v=i_FdiQMwKiw
     AWS_ECR_LOGIN_URI = demo>>  566373416292.dkr.ecr.ap-south-1.amazonaws.com
 
     ECR_REPOSITORY_NAME = simple-app
+
+Demo -> https://www.loom.com/share/6c0f44b7340140a2851e5f2c241fdab1
