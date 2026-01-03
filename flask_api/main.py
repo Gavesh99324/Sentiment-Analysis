@@ -13,14 +13,26 @@ import io
 from flask_cors import CORS
 from flask import Flask, request, jsonify, send_file
 import matplotlib
+import nltk
+
 matplotlib.use('Agg')  # Use non-interactive backend before importing pyplot
+
+try:
+    nltk.data.find('corpora/stopwords')
+except LookupError:
+    nltk.download('stopwords')
+
+try:
+    nltk.data.find('corpora/wordnet')
+except LookupError:
+    nltk.download('wordnet')
+    nltk.download('omw-1.4')
 
 
 app = Flask(__name__)
 CORS(app)
 
-# preprocessing
-
+# --- Preprocessing ---
 
 def preprocess_comment(comment):
     """Apply preprocessing transformations to a comment."""
@@ -54,12 +66,11 @@ def preprocess_comment(comment):
         return comment
 
 
-# Load the model and vectorizer from the model registry and local storage
+# --- Model Loading Logic ---
+
 def load_model_and_vectorizer(model_name, model_version, vectorizer_path):
     # Set MLflow tracking URI to your server
-    # Replace with your MLflow tracking URI
-    mlflow.set_tracking_uri(
-        "http://ec2-54-167-108-249.compute-1.amazonaws.com:5000/")
+    mlflow.set_tracking_uri("http://ec2-3-85-18-202.compute-1.amazonaws.com:5000/")
     client = MlflowClient()
     model_uri = f"models:/{model_name}/{model_version}"
     model = mlflow.pyfunc.load_model(model_uri)
@@ -70,13 +81,8 @@ def load_model_and_vectorizer(model_name, model_version, vectorizer_path):
     return model, vectorizer
 
 
-# Initialize the model and vectorizer
-model, vectorizer = load_model_and_vectorizer(
-    "my_model", "1", "./tfidf_vectorizer.pkl")
-
-
-def load_model(model_path, vectorizer_path):
-    """Load the trained model."""
+def load_model_local(model_path, vectorizer_path):
+    """Load the trained model from local disk."""
     try:
         with open(model_path, 'rb') as file:
             model = pickle.load(file)
@@ -88,13 +94,15 @@ def load_model(model_path, vectorizer_path):
     except Exception as e:
         raise
 
+# --- INITIALIZE MODEL ---
+# Option 1: Load from AWS (Commented out to prevent errors)
+# model, vectorizer = load_model_and_vectorizer("my_model", "1", "./tfidf_vectorizer.pkl")
 
-# Initialize the model and vectorizer
-model, vectorizer = load_model("./lgbm_model.pkl", "./tfidf_vectorizer.pkl")
+# Option 2: Load from Local File (Active)
+model, vectorizer = load_model_local("./lgbm_model.pkl", "./tfidf_vectorizer.pkl")
 
-# Initialize the model and vectorizer
-# model, vectorizer = load_model_and_vectorizer("my_model", "1", "./tfidf_vectorizer.pkl")  # Update paths and versions as needed
 
+# --- Routes ---
 
 @app.route('/')
 def home():
@@ -114,17 +122,16 @@ def predict_with_timestamps():
         timestamps = [item['timestamp'] for item in comments_data]
 
         # Preprocess each comment before vectorizing
-        preprocessed_comments = [preprocess_comment(
-            comment) for comment in comments]
+        preprocessed_comments = [preprocess_comment(comment) for comment in comments]
 
         # Transform comments using the vectorizer
         transformed_comments = vectorizer.transform(preprocessed_comments)
 
         # Convert the sparse matrix to dense format
-        dense_comments = transformed_comments.toarray()  # Convert to dense array
+        dense_comments = transformed_comments.toarray()
 
         # Make predictions
-        predictions = model.predict(dense_comments).tolist()  # Convert to list
+        predictions = model.predict(dense_comments).tolist()
 
         # Convert predictions to strings for consistency
         predictions = [str(pred) for pred in predictions]
@@ -149,20 +156,17 @@ def predict():
 
     try:
         # Preprocess each comment before vectorizing
-        preprocessed_comments = [preprocess_comment(
-            comment) for comment in comments]
+        preprocessed_comments = [preprocess_comment(comment) for comment in comments]
 
         # Transform comments using the vectorizer
         transformed_comments = vectorizer.transform(preprocessed_comments)
 
         # Convert the sparse matrix to dense format
-        dense_comments = transformed_comments.toarray()  # Convert to dense array
+        dense_comments = transformed_comments.toarray()
 
         # Make predictions
-        predictions = model.predict(dense_comments).tolist()  # Convert to list
+        predictions = model.predict(dense_comments).tolist()
 
-        # Convert predictions to strings for consistency
-        # predictions = [str(pred) for pred in predictions]
     except Exception as e:
         return jsonify({"error": f"Prediction failed: {str(e)}"}), 500
 
@@ -229,8 +233,7 @@ def generate_wordcloud():
             return jsonify({"error": "No comments provided"}), 400
 
         # Preprocess comments
-        preprocessed_comments = [preprocess_comment(
-            comment) for comment in comments]
+        preprocessed_comments = [preprocess_comment(comment) for comment in comments]
 
         # Combine all comments into a single string
         text = ' '.join(preprocessed_comments)
@@ -301,9 +304,9 @@ def generate_trend_graph():
         plt.figure(figsize=(12, 6))
 
         colors = {
-            -1: 'red',     # Negative sentiment
-            0: 'gray',     # Neutral sentiment
-            1: 'green'     # Positive sentiment
+            -1: 'red',    # Negative sentiment
+            0: 'gray',    # Neutral sentiment
+            1: 'green'    # Positive sentiment
         }
 
         for sentiment_value in [-1, 0, 1]:
